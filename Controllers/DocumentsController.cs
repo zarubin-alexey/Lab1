@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Lab1.Controllers
 {
-    [Route("api/documents")]
+    [Route("api/[controller]")]
     [ApiController]
     public class DocumentsController : ControllerBase
     {
@@ -19,47 +19,47 @@ namespace Lab1.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Document>> Get()
+        public List<Document> Get()
         {
-            return await documentsService.GetAsync();
+            return documentsService.Get();
         }
 
-        [HttpGet("{id}")]
-        public async Task<Document> Get(int id)
+        [HttpGet("{id:int}")]
+        public Document GetId(int id)
         {
-            return await documentsService.GetAsync(id);
+            return documentsService.Get(id);
         }
 
-        [HttpGet("{author}")]
-        public async Task<Document> Get(string author)
+        [HttpGet("author/{author}")]
+        public List<Document> GetAuthor(string author)
         {
-            return await documentsService.GetAsync(author);
+            return documentsService.Get(author);
         }
 
-        [HttpGet("{author}/{signed}")]
-        public async Task<Document> Get(string author, bool signed)
+        [HttpGet("author/{author}/signed/{signed}")]
+        public List<Document> Get(string author, bool signed)
         {
-            return await documentsService.GetAsync(author, signed);
+            return documentsService.Get(author, signed);
         }
 
-        [HttpGet("{from}/{to}")]
-        public async Task<Document> Get(DateTime from, DateTime to)
+        [HttpGet("from/{from}/to/{to}")]
+        public List<Document> Get(DateTime from, DateTime to)
         {
-            return await documentsService.GetAsync(from, to);
+            return documentsService.Get(from, to);
         }
 
         [HttpPost]
-        public async Task<Document> Post([FromBody] Document newDocument)
+        public Document Post([FromBody] Document newDocument)
         {
-            await documentsService.CreateAsync(newDocument);
+            documentsService.Create(newDocument);
 
             return newDocument;
         }
 
         [HttpPut]
-        public async Task<Document> Put(int id, [FromBody] Document updatedDocument)
+        public Document Put([FromBody] Document updatedDocument)
         {
-            var document = await documentsService.GetAsync(id);
+            var document = documentsService.Get(updatedDocument.Id);
             if (document == null)
             {
                 return null;
@@ -67,21 +67,21 @@ namespace Lab1.Controllers
 
             updatedDocument.Id = document.Id;
 
-            await documentsService.UpdateAsync(id, updatedDocument);
+            documentsService.Update(updatedDocument.Id, updatedDocument);
 
             return updatedDocument;
         }
 
         [HttpDelete]
-        public async Task Delete(int id)
+        public void Delete(int id)
         {
-            var employee = await documentsService.GetAsync(id);
+            var employee = documentsService.Get(id);
             if (employee == null)
             {
                 return;
             }
 
-            await documentsService.RemoveAsync(id);
+            documentsService.Remove(id);
         }
     }
 }

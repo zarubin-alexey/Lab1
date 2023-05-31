@@ -17,80 +17,80 @@ namespace Lab1.Services
             connection = new NpgsqlConnection("Host=localhost;Username=postgres;Password=1111;Database=Documents");
         }
 
-        public async Task<List<Document>> GetAsync()
+        public List<Document> Get()
         {
             var sql = "Select * from documents;";
 
-            return await ExecuteGet(sql);
+            return ExecuteGet(sql);
         }
 
-        public async Task<Document> GetAsync(string author)
-        {
-            var sql = $"Select * from documents where \"author\" = '{author}';";
-
-            return (await ExecuteGet(sql)).FirstOrDefault();
-        }
-
-        public async Task<Document> GetAsync(string author, bool signed)
-        {
-            var sql = $"Select * from documents where \"author\" = '{author}' and signed IS {(signed ? "NOT " : "")}NULL;";
-
-            return (await ExecuteGet(sql)).FirstOrDefault();
-        }
-
-        public async Task<Document> GetAsync(DateTime from, DateTime to)
-        {
-            var sql = $"Select * from documents where created BETWEEN '{from}' AND '{to}'";
-
-            return (await ExecuteGet(sql)).FirstOrDefault();
-        }
-
-        public async Task<Document> GetAsync(int id)
+        public Document Get(int id)
         {
             var sql = $"Select * from documents where \"id\" = '{id}';";
 
-            return (await ExecuteGet(sql)).FirstOrDefault();
+            return ExecuteGet(sql).FirstOrDefault();
         }
 
-        public async Task CreateAsync(Document newDocument)
+        public List<Document> Get(string author)
+        {
+            var sql = $"Select * from documents where \"author\" = '{author}';";
+
+            return ExecuteGet(sql);
+        }
+
+        public List<Document> Get(string author, bool signed)
+        {
+            var sql = $"Select * from documents where \"author\" = '{author}' and signed IS {(signed ? "NOT " : "")}NULL;";
+
+            return ExecuteGet(sql);
+        }
+
+        public List<Document> Get(DateTime from, DateTime to)
+        {
+            var sql = $"Select * from documents where created BETWEEN '{from}' AND '{to}'";
+
+            return ExecuteGet(sql);
+        }
+
+        public void Create(Document newDocument)
         {
             var sql = $"insert into documents (\"id\", \"type\", \"content\", \"created\", \"signed\", \"author\") values ('{newDocument.Id}', '{newDocument.Type}', '{newDocument.Content}', '{newDocument.Created}', '{newDocument.Signed}', '{newDocument.Author}');";
 
-            await Execute(sql);
+            Execute(sql);
         }
 
-        public async Task UpdateAsync(int id, Document updatedDocument)
+        public void Update(int id, Document updatedDocument)
         {
             var sql = $"update documents set \"type\" = '{updatedDocument.Type}', \"content\" = '{updatedDocument.Content}', \"created\" = '{updatedDocument.Created}', \"signed\" = '{updatedDocument.Signed}', \"author\" = '{updatedDocument.Author}' where \"id\" = '{id}';";
 
-            await Execute(sql);
+            Execute(sql);
         }
 
-        public async Task RemoveAsync(int id)
+        public void Remove(int id)
         {
             var sql = $"delete from documents where \"id\" = '{id}';";
 
-            await Execute(sql);
+            Execute(sql);
         }
 
-        private async Task Execute(string sql)
+        private void Execute(string sql)
         {
             connection.Open();
 
             var cmd = new NpgsqlCommand(sql, connection);
 
-            await cmd.ExecuteNonQueryAsync();
+            cmd.ExecuteNonQuery();
 
             connection.Close();
         }
 
-        private async Task<List<Document>> ExecuteGet(string sql)
+        private List<Document> ExecuteGet(string sql)
         {
             connection.Open();
 
             var cmd = new NpgsqlCommand(sql, connection);
 
-            var reader = await cmd.ExecuteReaderAsync();
+            var reader = cmd.ExecuteReader();
             var documents = GetDocuments(reader);
 
             connection.Close();
